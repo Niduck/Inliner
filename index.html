@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Inliner</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/spectre.css/dist/spectre.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css"
+    />
+  </head>
+
+  <body>
+    <main>
+      <div
+        class="container p-centered"
+        style="width: 800px; text-align: center"
+      >
+        <div class="columns">
+          <div class="column col-12">
+            <div class="py-2">
+              <div class="h1">Inliner</div>
+              <div class="h6 label label-rounded">
+                Removes line-breaks from a text and replace them by spaces.
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="column col-12">
+            <textarea
+              name="inliner-text"
+              id="inliner-text"
+              cols="60"
+              rows="10"
+            ></textarea>
+          </div>
+          <div class="column col-12">
+            <div></div>
+            <p id="inliner-result"></p>
+            <div class="columns">
+              <div class="column col-12">
+                <button class="btn btn-primary" id="inliner-result-copy">
+                  Copy inlined
+                </button>
+              </div>
+              <div class="column col-12 py-2">
+                <div class="label label-secondary p-2">
+                  <small>Use CTRL+C to copy directly into the textarea.</small>
+                  <br />
+                  <small>Use CTRL+V to copy directly the result.</small>
+                </div>
+              </div>
+              <div class="column col-12">
+                <p
+                  style="opacity: 0"
+                  class="label label-primary label-rounded"
+                  id="inliner-result-copy_notification"
+                ></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <small>Made with ❤️ by a 🦆</small>
+      </div>
+    </main>
+
+    <script type="module">
+      //Textarea element
+      document
+        .getElementById("inliner-text")
+        .addEventListener("input", function (e) {
+          let text = e.target.value;
+          let inlined = text.replace(/(\r\n|\n|\r)/gm, " ");
+          document.getElementById("inliner-result").innerText = inlined;
+        });
+      //Button
+      let copyResult = function () {
+        let result = document.getElementById("inliner-result");
+        navigator.clipboard.writeText(result.innerText);
+        let notificationElement = document.getElementById(
+          "inliner-result-copy_notification"
+        );
+        setTimeout(function () {
+          notificationElement.innerText = "";
+          notificationElement.style.opacity = "0";
+        }, 2500);
+        notificationElement.innerText = "Copied to clipboard !";
+        notificationElement.style.opacity = "1";
+      };
+      document
+        .getElementById("inliner-result-copy")
+        .addEventListener("click", function () {
+          copyResult();
+        });
+      //CTRL+C / CTRL+V
+      document.body.addEventListener(
+        "keydown",
+        async function (myEvent) {
+          // function that verifies the detection
+          myEvent = myEvent || window.event; // 'myEvent' is event object
+          let key = myEvent.which || myEvent.keyCode; // this is to detect keyCode
+
+          // Detecting Ctrl
+          let ctrl = myEvent.ctrlKey
+            ? myEvent.ctrlKey
+            : key === 17
+            ? true
+            : false;
+
+          if (key == 86 && ctrl) {
+            //CTRL+V
+            document.getElementById("inliner-text").value =
+              await navigator.clipboard.readText();
+            var event = new Event("input", {
+              bubbles: true,
+              cancelable: true,
+            });
+
+            document.getElementById("inliner-text").dispatchEvent(event);
+          } else if (key == 67 && ctrl) {
+            //CTR+C
+            copyResult();
+          }
+        },
+        false
+      );
+    </script>
+  </body>
+</html>
